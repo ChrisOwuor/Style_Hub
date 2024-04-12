@@ -191,16 +191,7 @@ OTP_EXPIRE_TIME = os.environ.get('OTP_EXPIRE_TIME')
 
 
 # mail configuration
-'''
-MAIL_DRIVER=smtp
-MAIL_HOST=smtp-relay.brevo.com
-MAIL_PORT=587
-MAIL_USERNAME= nywelenyumbani@gmail.com
-MAIL_PASSWORD=XTGEYaCtROrBj9kq
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="${MAIL_USERNAME}"
-MAIL_FROM_NAME="${APP_NAME}"
-'''
+
 
 # Default storage configuration
 '''
