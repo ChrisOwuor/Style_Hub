@@ -89,6 +89,17 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# Database configutations for custom database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': int(os.environ.get('DB_PORT'))
+    }
+}
 
 
 # Password validation
@@ -128,7 +139,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 # STATIC_ROOT = os.path.join(BASE_DIR,'static')
-MEDIA_URLS ='/media/'
+MEDIA_URLS = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'Media')
 
 # Default primary key field type
