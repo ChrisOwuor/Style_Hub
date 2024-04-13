@@ -90,6 +90,7 @@ DATABASES = {
     }
 }
 # Database configutations for custom database
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -100,6 +101,9 @@ DATABASES = {
         'PORT': int(os.environ.get('DB_PORT'))
     }
 }
+
+
+"""
 
 
 # Password validation
