@@ -56,7 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     role = models.CharField(
         max_length=10, choices=UserType.choices, default=UserType.CLIENT)
-    u_id = models.UUIDField(editable=False)
+    u_id = models.UUIDField(editable=False, default=uuid.uuid4)
 
     objects = CustomAccountManager()
 
@@ -78,9 +78,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Admin(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='admin_profile')
+    u_id = models.UUIDField(editable=False, default=uuid.uuid4)
 
     def __str__(self):
         return f"Admin: {self.user.full_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.u_id:
+            self.u_id = self.user.u_id
+        super().save(*args, **kwargs)
 
 
 class Client(models.Model):
@@ -89,9 +95,15 @@ class Client(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     residency = models.CharField(max_length=100, null=True, blank=True)
+    u_id = models.UUIDField(editable=False, default=uuid.uuid4)
 
     def __str__(self):
         return f"Client: {self.user.full_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.u_id:
+            self.u_id = self.user.u_id
+        super().save(*args, **kwargs)
 
 
 class Stylist(models.Model):
@@ -115,9 +127,16 @@ class Stylist(models.Model):
     gender = models.CharField(
         max_length=50, default="Female", choices=GENDER_CHOICES)
     location = models.CharField(max_length=100, null=True, blank=True)
+    verified = models.BooleanField(default=False)
+    u_id = models.UUIDField(editable=False, default=uuid.uuid4)
 
     def __str__(self):
         return f"Stylist: {self.user.full_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.u_id:
+            self.u_id = self.user.u_id
+        super().save(*args, **kwargs)
 
 
 class Otp(models.Model):
