@@ -1,8 +1,8 @@
 # views.py
 import json
-from authentication.models import Otp, User
+from Api.models import Otp, Questionnaire
+from authentication.models import User
 from style_hub import settings
-from stylist.models import Questionnaire
 from stylist.serializers import BaseResponseSerializer, DocumentsSerializer
 from .serializers import OtpVerifySerializer, ResetPasswordSerializer, StylistSerializer, OtpSerializer, ClientSerializer, AdminSerializer, BaseUserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -51,8 +51,7 @@ class AdminRegisterAPIView(APIView):
 class ClientRegisterAPIView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self, request, ):
-        request.data['role'] = 'client'
+    def post(self, request):
         user_serializer = BaseUserSerializer(data=request.data)
         if user_serializer.is_valid():
             new_client = user_serializer.save()
@@ -63,9 +62,9 @@ class ClientRegisterAPIView(APIView):
             if client_serializer.is_valid():
                 client_serializer.save()
                 return Response(user_serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                new_client.delete()
-                return Response(client_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            new_client.delete()
+            return Response(client_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -75,9 +74,8 @@ class StylistRegisterAPIView(APIView):
 
     def post(self, request):
         try:
-            request.data['role'] = 'stylist'
-
-            user_serializer = BaseUserSerializer(data=request.data)
+            user_serializer = BaseUserSerializer(
+                data=request.data, context={"role": "stylist"})
             if not user_serializer.is_valid():
                 return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

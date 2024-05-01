@@ -3,7 +3,7 @@ from rest_framework import serializers
 from administration.models import ApprovalRequest
 
 
-class AprrovalRequestSerializer(serializers.ModelSerializer):
+class ApprovalRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApprovalRequest
         fields = ['id', 'date', 'time', 'stylist_id','status']

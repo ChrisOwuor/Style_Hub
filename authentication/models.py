@@ -78,7 +78,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Admin(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='admin_profile')
-    u_id = models.UUIDField(editable=False, default=uuid.uuid4)
+    u_id = models.UUIDField(editable=False)
 
     def __str__(self):
         return f"Admin: {self.user.full_name}"
@@ -95,7 +95,7 @@ class Client(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     residency = models.CharField(max_length=100, null=True, blank=True)
-    u_id = models.UUIDField(editable=False, default=uuid.uuid4)
+    u_id = models.UUIDField(editable=False)
 
     def __str__(self):
         return f"Client: {self.user.full_name}"
@@ -128,7 +128,8 @@ class Stylist(models.Model):
         max_length=50, default="Female", choices=GENDER_CHOICES)
     location = models.CharField(max_length=100, null=True, blank=True)
     verified = models.BooleanField(default=False)
-    u_id = models.UUIDField(editable=False, default=uuid.uuid4)
+    u_id = models.UUIDField(editable=False)
+    availability = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Stylist: {self.user.full_name}"
@@ -139,26 +140,3 @@ class Stylist(models.Model):
         super().save(*args, **kwargs)
 
 
-class Otp(models.Model):
-    created_for = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True)
-    code = models.CharField(max_length=7)
-    is_verified = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def is_valid(self):
-        """get desired mins otp"""
-        otp_time_sec = float(settings.OTP_EXPIRE_TIME * 60)
-        current_time = timezone.now()
-        time_diff = current_time - self.created_at
-
-        return time_diff.total_seconds() <= otp_time_sec
-
-    @classmethod
-    def get_code(cls):
-        random_number = random.randint(1000, 9999)
-        return random_number
-
-    def __str__(self):
-        return f"OTP for {self.created_for.full_name}"
