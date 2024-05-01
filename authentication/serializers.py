@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import User, Admin, Client, Stylist, Otp
+
+from Api.models import Otp
+from .models import User, Admin, Client, Stylist
 
 
 class OtpSerializer(serializers.ModelSerializer):
@@ -43,6 +45,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        role = self.context.get("role","")
+        validated_data['role'] = role
 
         password = validated_data.pop('password', None)
 

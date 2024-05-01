@@ -1,7 +1,8 @@
 
 
+from .models import StyleCategorie, Style, StyleVariation
 from django.contrib import admin
-from .models import Document, UserResponse, Questionnaire
+from .models import StylistDocument
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -10,19 +11,34 @@ class DocumentAdmin(admin.ModelAdmin):
     list_filter = ['stylist_id']
 
 
-admin.site.register(Document, DocumentAdmin)
+admin.site.register(StylistDocument, DocumentAdmin)
 
 
-class ResponseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'content', 'stylist_id', 'questionnaire_id']
-    list_filter = ['stylist_id']
 
 
-admin.site.register(UserResponse, ResponseAdmin)
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', 'category_name', ]
+    list_filter = ['category_name',]
 
 
-class QuestionnaireAdmin(admin.ModelAdmin):
-    list_display = ['id', 'question', ]
+admin.site.register(StyleCategorie, CategoryAdmin)
 
 
-admin.site.register(Questionnaire, QuestionnaireAdmin)
+class StyleAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'stylist', 'category',]
+    list_filter = ['stylist', 'category']
+
+
+admin.site.register(Style, StyleAdmin)
+
+
+class VariationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'price', 'style', ]
+    list_filter = ['style']
+
+
+admin.site.register(StyleVariation, VariationAdmin)
+
+
+

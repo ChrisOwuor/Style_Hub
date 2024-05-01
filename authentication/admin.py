@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import User, Admin, Client, Stylist, Otp
+from .models import User, Admin, Client, Stylist
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'full_name', 'start_date',
+    list_display = ('email', 'full_name', 'start_date', 'role',
                     'is_staff', 'is_active', )
 
 
@@ -25,15 +25,8 @@ admin.site.register(Client, ClientAdmin)
 
 
 class StylistAdmin(admin.ModelAdmin):
-    list_display = ('user', 'date_of_birth', 'phone_number', 'residency', 'next_of_kin_name',
+    list_display = ('user', 'date_of_birth', 'phone_number', 'residency', 'next_of_kin_name', 
                     'next_of_kin_phone', 'emergency_contact_name', 'emergency_contact_phone', 'location')
 
 
 admin.site.register(Stylist, StylistAdmin)
-
-
-class OtpAdmin(admin.ModelAdmin):
-    list_display = ('created_for', 'code', 'is_verified', 'created_at')
-
-
-admin.site.register(Otp, OtpAdmin)

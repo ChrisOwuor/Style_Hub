@@ -9,6 +9,9 @@ urlpatterns = [
     path('api/admin/', include('administration.urls')),
     path('api/client/', include('client.urls')),
     path('api/stylist/', include('stylist.urls')),
+    path('', include('Api.urls')),
+
+
 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
