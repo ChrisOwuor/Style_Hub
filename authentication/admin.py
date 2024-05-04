@@ -25,7 +25,7 @@ admin.site.register(Client, ClientAdmin)
 
 
 class StylistAdmin(admin.ModelAdmin):
-    list_display = ('user', 'date_of_birth', 'phone_number', 'residency', 'next_of_kin_name', 
+    list_display = ('user', 'date_of_birth', 'phone_number', 'residency', 'next_of_kin_name', 'availability',
                     'next_of_kin_phone', 'emergency_contact_name', 'emergency_contact_phone', 'location')
 
 

@@ -131,6 +131,8 @@ class Stylist(models.Model):
     u_id = models.UUIDField(editable=False)
     availability = models.BooleanField(default=False)
 
+    # add flag to check if approved
+
     def __str__(self):
         return f"Stylist: {self.user.full_name}"
 
@@ -138,5 +140,3 @@ class Stylist(models.Model):
         if not self.u_id:
             self.u_id = self.user.u_id
         super().save(*args, **kwargs)
-
-

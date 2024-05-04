@@ -15,7 +15,7 @@ urlpatterns = [
     path('booking/<str:u_id>/<str:action>/',
          views.BookingActionView.as_view(), name='accept_reject booking'),
     path('stylists/', views.StylistListView.as_view(), name='stylists-list'),
-    path('stylists/<str:id>/', views.StylistDetailView.as_view(),
+    path('stylists/<str:u_id>/', views.StylistDetailView.as_view(),
          name='stylist-detail'),
     path('approve-transaction/<str:u_id>/',
          views.ApproveTransactionAPIView.as_view(), name='approve_transaction'),

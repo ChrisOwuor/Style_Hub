@@ -47,7 +47,6 @@ class AdminApprovalsActionView(APIView):
             approval_req = ApprovalRequest.objects.get(id=id)
             approval_req.status = action
             approval_req.save()
-
             stylist = approval_req.stylist_id
             stylist.verified = True
             stylist.save()
