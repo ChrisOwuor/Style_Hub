@@ -35,9 +35,9 @@ class StylistDetailView(APIView):
     """Method to get single stylist details"""
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, id):
+    def get(self, request, u_id):
         try:
-            stylist = Stylist.objects.get(id=id)
+            stylist = Stylist.objects.get(u_id=u_id)
             stylist_serialized = StylistSerializer(stylist).data
             return Response(stylist_serialized, status=status.HTTP_200_OK)
 
@@ -123,13 +123,16 @@ class BookingActionView(APIView):
     """method to reject or accept booking based on the provided action """
     permission_classes = [IsAuthenticated]
 
-    def put(self, u_id, request, action):
+    def put(self, request,  u_id, action):
         try:
             stylist = Stylist.objects.get(user=request.user)
             booking = Booking.objects.get(u_id=u_id, stylist=stylist)
             if action in dict(Booking.STATUS_CHOICES):
                 booking.status = action
                 booking.save()
+                if action == "confirmed":
+                    stylist.availability = False
+                    stylist.save()
                 return Response({"msg": f"Successfully {action} the booking"}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
