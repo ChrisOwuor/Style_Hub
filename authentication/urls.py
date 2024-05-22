@@ -13,7 +13,6 @@ urlpatterns = [
          name='stylist_register'),
     # Login URLs
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # password recovery
     path('password-recovery/request-otp/',
          RequestOTPView.as_view(), name='request_otp'),

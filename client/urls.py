@@ -13,7 +13,6 @@ urlpatterns = [
          name='view style_detail'),
     path('booking/', views.BookingView.as_view(),
          name='view_create booking'),
-    path('booking/<str:u_id>/', views.BookingDetailView.as_view(),
-         name='edit_delete booking'),
+
 
 ]

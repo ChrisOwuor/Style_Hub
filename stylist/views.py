@@ -99,13 +99,10 @@ class AllBookingsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Implement logic for viewing all bookings per stylist
         try:
             stylist = Stylist.objects.get(user=request.user)
             stylist_bookings = Booking.objects.filter(stylist=stylist)
-
             serializer = BookingSerializer(stylist_bookings, many=True).data
-
             return Response(serializer, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -152,30 +149,7 @@ class BookingActionView(APIView):
 
 
 class StylelListView(APIView):
-    """method to get all styles for the single stylist"""
     permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-
-        try:
-            stylist = Stylist.objects.get(user=request.user)
-            styles = Style.objects.filter(stylist=stylist)
-
-            serializer = StyleSerializer(styles, many=True).data
-
-            for style in serializer:
-                style["style_category"] = StyleCategorie.objects.get(
-                    id=style.get('category')).category_name
-                style.pop('category')
-                style.pop('stylist')
-
-            return Response(serializer, status=status.HTTP_200_OK)
-
-        except Stylist.DoesNotExist:
-            return Response({"error": "Stylist not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     """method to add a new style"""
 
@@ -185,7 +159,6 @@ class StylelListView(APIView):
             stylist = Stylist.objects.get(user=request.user)
 
             style_data = request.data
-            
 
             categorie_serializer = StyleCategorieSerializer(data=request.data)
 
@@ -206,24 +179,6 @@ class StylelListView(APIView):
 
 
 class VariationListView(APIView):
-    """method to get all variations"""
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-
-        try:
-            variations = StyleVariation.objects.all()
-
-            serializer = StyleVariationSerializer(variations, many=True).data
-
-            return Response(serializer, status=status.HTTP_200_OK)
-
-        except StyleVariation.DoesNotExist:
-            return Response({"error": "variation not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     """method to add a new variation"""
 
     def post(self, request):
@@ -241,7 +196,7 @@ class VariationListView(APIView):
 
             return Response(variation_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Style.DoesNotExist:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error":"style not found"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -268,60 +223,6 @@ class StyleDetailView(APIView):
         except Exception as e:
 
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    """method to update a style by the creating stylist"""
-
-    def put(self, request, u_id):
-        try:
-            stylist = Stylist.objects.get(user=request.user)
-            style = Style.objects.get(u_id=u_id, stylist=stylist)
-            style_data = request.data
-
-            style_serializer = StyleSerializer(data=style_data, instance=style)
-
-            if style_serializer.is_valid():
-
-                style_serializer.save()
-
-                return Response({"msg": "style updated successfully"}, status=status.HTTP_200_OK)
-            return Response(style_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        except Style.DoesNotExist:
-            return Response({"error": "Style not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        except PermissionDenied:
-            return Response({"error": "You do not have permission to update this style"}, status=status.HTTP_403_FORBIDDEN)
-
-    """"method to delete a style"""
-
-    def delete(self, request, u_id):
-        try:
-            stylist = Stylist.objects.get(user=request.user)
-            style = Style.objects.get(u_id=u_id, stylist=stylist)
-            style.delete()
-            return Response({"msg": "stly deleted successfullly"}, status=status.HTTP_200_OK)
-
-        except Style.DoesNotExist:
-            return Response({"error": "Style not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        except PermissionDenied:
-            return Response({"error": "You do not have permission to delete this style"}, status=status.HTTP_403_FORBIDDEN)
-
-
-class ApproveTransactionAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request, u_id):
-
-        try:
-
-            transaction = Transaction.objects.get(id=u_id)
-            transaction.status = 'successful'
-            transaction.save()
-            return Response({'message': 'Transaction approved successfully'}, status=status.HTTP_200_OK)
-
-        except transaction.DoesNotExist():
-            return Response({"message": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class CategoryView(APIView):

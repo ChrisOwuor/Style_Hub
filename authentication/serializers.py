@@ -45,7 +45,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        role = self.context.get("role","")
+        role = self.context.get("role", "")
         validated_data['role'] = role
 
         password = validated_data.pop('password', None)
@@ -160,20 +160,4 @@ class StylistSerializer(serializers.ModelSerializer):
         return stylist
 
     def update(self, instance, validated_data):
-        instance.user.email = validated_data.get(
-            'user', {}).get('email', instance.user.email)
-        instance.user.user_name = validated_data.get(
-            'user', {}).get('user_name', instance.user.user_name)
-        instance.user.start_date = validated_data.get(
-            'user', {}).get('start_date', instance.user.start_date)
-        instance.user.is_staff = validated_data.get(
-            'user', {}).get('is_staff', instance.user.is_staff)
-        instance.user.is_active = validated_data.get(
-            'user', {}).get('is_active', instance.user.is_active)
-        instance.user.role = validated_data.get(
-            'user', {}).get('role', instance.user.role)
-        instance.user.u_id = validated_data.get(
-            'user', {}).get('u_id', instance.user.u_id)
-        instance.user.save()
-        instance.save()
-        return instance
+        pass

@@ -1,5 +1,4 @@
 from rest_framework.views import APIView
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,9 +8,7 @@ from Api.serializers import BookingSerializer
 from authentication.models import Client, Stylist
 from authentication.serializers import ClientSerializer
 from stylist.models import Style, StyleCategorie, StyleVariation
-from stylist.serializers import StyleCategorieSerializer, StyleSerializer, StyleVariationSerializer
-
-# Create your views here.
+from stylist.serializers import StyleSerializer, StyleVariationSerializer
 
 
 class ClientListView(APIView):
@@ -23,9 +20,6 @@ class ClientListView(APIView):
 
             clients = Client.objects.all()
             serializer = ClientSerializer(clients, many=True).data
-
-            for client in serializer:
-                client.pop('user')
             return Response(serializer, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -105,6 +99,12 @@ class StyleDetailView(APIView):
 
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def put(self, request, u_id):
+        ...
+
+    def delete(self, request, u_id):
+        ...
+
 
 class StyleCategoryView(APIView):
     permission_classes = [IsAuthenticated]
@@ -124,7 +124,6 @@ class StyleCategoryView(APIView):
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 class BookingView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -136,9 +135,14 @@ class BookingView(APIView):
             serializer = BookingSerializer(bookings, many=True).data
 
             for booking in serializer:
+                styles = Style.objects.get(id=booking["style_id"])
+                serialized_styles = StyleSerializer(
+                    styles).data
                 booking["stylist_name"] = Stylist.objects.get(
                     id=booking["stylist"]).user_name
+                booking["style"] = serialized_styles
                 booking.pop('client')
+                booking.pop('style_id')
                 booking.pop('stylist')
 
             return Response(serializer, status=status.HTTP_200_OK)
@@ -150,12 +154,12 @@ class BookingView(APIView):
         try:
             u_id = request.data.get("u_id")
             client = Client.objects.get(user=request.user)
-            stylist = Stylist.objects.get(u_id=u_id)
-            if not stylist.availability:
+            style = Style.objects.get(u_id=u_id)
+            if not style.stylist.availability:
                 return Response({"error": "stylist not available for bookig right now"}, status=status.HTTP_200_OK)
 
             booking_serializer = BookingSerializer(data=request.data, context={
-                "stylist": stylist, "client": client})
+                "style": style, "client": client, "stylist": style.stylist})
 
             if booking_serializer.is_valid():
                 booking_serializer.save()
@@ -169,63 +173,8 @@ class BookingView(APIView):
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class BookingDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, u_id):
-
-        try:
-            client = Client.objects.get(user=request.user)
-            bookings = Booking.objects.get(client=client.id, u_id=u_id)
-
-            booking = BookingSerializer(bookings).data
-
-            booking["stylist_name"] = Stylist.objects.get(
-                id=booking["stylist"]).user_name
-            booking.pop('client')
-            booking.pop('stylist')
-
-            return Response(booking, status=status.HTTP_200_OK)
-
-        except Booking.DoesNotExist:
-            return Response({"msg": "booking missing"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     def put(self, request, u_id):
-        try:
-            client = Client.objects.get(user=request.user)
-
-            booking = Booking.objects.get(u_id=u_id, client=client)
-
-            booking_serializer = BookingSerializer(
-                data=request.data, instance=booking)
-
-            if booking_serializer.is_valid():
-                booking_serializer.save()
-                return Response({"message": "successfully updated"}, status=status.HTTP_200_OK)
-            return Response(booking_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Client.DoesNotExist:
-            return Response({"msg": "client missing"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Stylist.DoesNotExist:
-            return Response({"msg": "stylist missing"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        ...
 
     def delete(self, request, u_id):
-        try:
-            client = Client.objects.get(user=request.user)
-            booking = Booking.objects.get(client=client.id, u_id=u_id)
-
-            booking.delete()
-
-            return Response({"msg": "successfully deleted "}, status=status.HTTP_200_OK)
-
-        except Booking.DoesNotExist:
-            return Response({"msg": "booking missing"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        ...

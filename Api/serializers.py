@@ -6,16 +6,18 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['id', 'client', 'stylist', 'date',
-                  'time', 'status', 'completed', 'u_id']
+                  'time', 'status', 'completed', 'u_id', 'style_id']
 
-        read_only_fields = ['client', 'stylist']
+        read_only_fields = ['client', 'stylist', 'style_id']
 
     def create(self, validated_data):
-        client = self.context.get('client',"")
-        stylist = self.context.get('stylist',"")
+        client = self.context.get('client', "")
+        stylist = self.context.get('stylist', "")
+        style = self.context.get('style', "")
 
         validated_data["stylist"] = stylist
         validated_data['client'] = client
+        validated_data['style_id'] = style
 
         return Booking.objects.create(**validated_data)
 

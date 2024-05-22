@@ -24,28 +24,7 @@ class AdminRegisterAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        if request.user.role == "admin":
-            user_serializer = BaseUserSerializer(data=request.data)
-
-            if user_serializer.is_valid():
-                new_user = user_serializer.save()
-
-                admin_data = {
-                    'user': new_user.id,
-                }
-                admin_serializer = AdminSerializer(data=admin_data)
-
-                if admin_serializer.is_valid():
-                    admin_serializer.save()
-
-                    return Response(user_serializer.data, status=status.HTTP_201_CREATED)
-                else:
-                    new_user.delete()
-                    return Response(admin_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({"error": "Unauthorized you cant create an admi  user"}, status=status.HTTP_401_UNAUTHORIZED)
+        pass
 
 
 class ClientRegisterAPIView(APIView):
@@ -164,7 +143,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-        # Add custom claims
+        # custom claims
         token["role"] = user.role
         # ...
 
@@ -198,8 +177,8 @@ class RequestOTPView(APIView):
             settings.BASE_DIR, "authentication", "templates", "mailtemp.html")
         subject = "Email Verification"
         message = ""
-        sender = f"(Nuymba Nywele) <{settings.EMAIL_HOST_USER}>"
-        recepient = [user.email]
+        sender = f"(Nuymba Nywele) <owuorchrispines@gmail.com>"
+        recepient = "owuorchrispine77@gmail.com"
         context = {
             "user": user,
             "otp": otp_serializer["code"]

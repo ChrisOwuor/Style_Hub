@@ -10,8 +10,6 @@ urlpatterns = [
          name='view all_categories'),
     path('styles/variation/', views.VariationListView.as_view(),
          name='view_create variation'),
-    path('style/<str:u_id>/', views.StyleDetailView.as_view(),
-         name='view_edit_delete style_detail'),
     path('bookings/', views.AllBookingsView.as_view(),
          name='view bookings'),
     path('booking/<str:u_id>/',
@@ -21,7 +19,4 @@ urlpatterns = [
     path('stylists/', views.StylistListView.as_view(), name='stylists-list'),
     path('stylists/<str:u_id>/', views.StylistDetailView.as_view(),
          name='stylist-detail'),
-    path('approve-transaction/<str:u_id>/',
-         views.ApproveTransactionAPIView.as_view(), name='approve_transaction'),
-
 ]

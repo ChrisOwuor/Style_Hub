@@ -16,7 +16,7 @@ class AllAPIEndpointsView(APIView):
             try:
                 urls_module = import_module(app_name + '.urls')
             except ModuleNotFoundError:
-                continue  # Skip apps without URLs
+                continue  
 
             urlpatterns = urls_module.urlpatterns
             endpoints = self._get_endpoints(urlpatterns, app_name)
