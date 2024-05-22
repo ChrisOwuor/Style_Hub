@@ -18,7 +18,7 @@ admin.site.register(StylistDocument, DocumentAdmin)
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'category_name', ]
+    list_display = ['id', 'category_name','u_id' ]
     list_filter = ['category_name',]
 
 

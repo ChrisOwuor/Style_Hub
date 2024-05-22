@@ -22,9 +22,6 @@ class StylistDocument(models.Model):
         return f"Document for {self.stylist_id.user_name}"
 
 
-
-
-
 class StyleCategorie(models.Model):
     category_name = models.CharField(max_length=100)
     u_id = models.UUIDField(editable=False, default=uuid.uuid4)
@@ -38,16 +35,16 @@ class StyleCategorie(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return self.category_name
 
 
 class Style(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     stylist = models.ForeignKey(Stylist, on_delete=models.CASCADE)
+    photo = models.ImageField(null=True, blank=True, upload_to="Media/")
     category = models.ForeignKey(StyleCategorie, on_delete=models.CASCADE)
     u_id = models.UUIDField(editable=False, default=uuid.uuid4)
-   
 
     def save(self, *args, **kwargs):
         if not self.u_id:
@@ -63,9 +60,10 @@ class Style(models.Model):
 
 class StyleVariation(models.Model):
     name = models.CharField(max_length=100)
-    price = models.TextField()
-    photo = models.ImageField()
-    video = models.ImageField()
+    price = models.DecimalField(decimal_places=4, max_digits=12)
+    photo = models.ImageField(null=True, blank=True, upload_to="Media/")
+    video = models.ImageField(null=True, blank=True, upload_to="Media/")
+    length = models.DecimalField(decimal_places=4, max_digits=12)
     style = models.ForeignKey(Style, on_delete=models.CASCADE)
     u_id = models.UUIDField(editable=False, default=uuid.uuid4)
 
@@ -79,6 +77,3 @@ class StyleVariation(models.Model):
 
     def __str__(self):
         return self.name
-
-
-

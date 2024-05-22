@@ -65,7 +65,8 @@ class StyleSerializer(serializers.ModelSerializer):
 class StyleVariationSerializer(serializers.ModelSerializer):
     class Meta:
         model = StyleVariation
-        fields = ['id', 'name', 'price', 'photo', 'video', 'style', 'u_id']
+        fields = ['id', 'name', 'price', 'photo',
+                  'video', 'style', 'u_id', 'length']
         read_only_fields = ['u_id', 'style']
 
     def create(self, validated_data):
@@ -86,11 +87,12 @@ class StyleVariationSerializer(serializers.ModelSerializer):
 class StyleCategorieSerializer(serializers.ModelSerializer):
     class Meta:
         model = StyleCategorie
-        fields = ['id', 'category_name', 'u_id']
+        fields = '__all__'
         read_only_fields = ['u_id']
 
     def create(self, validated_data):
-        return StyleCategorie.objects.create(**validated_data)
+        style = StyleCategorie.objects.create(**validated_data)
+        return style
 
     def update(self, instance, validated_data):
         instance.category_name = validated_data.get(

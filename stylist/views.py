@@ -7,8 +7,8 @@ from Api.serializers import BookingSerializer
 from administration.serializers import ApprovalRequestSerializer
 from authentication.models import Stylist
 from authentication.serializers import StylistSerializer
-from stylist.models import Style, StyleCategorie
-from stylist.serializers import StyleCategorieSerializer, StyleSerializer, StyleVariationSerializer
+from stylist.models import Style, StyleCategorie, StyleVariation, StylistDocument
+from stylist.serializers import DocumentsSerializer, StyleCategorieSerializer, StyleSerializer, StyleVariationSerializer
 from rest_framework.exceptions import PermissionDenied
 
 
@@ -23,6 +23,14 @@ class StylistListView(APIView):
         try:
             stylists = Stylist.objects.all()
             stylists_serialized = StylistSerializer(stylists, many=True).data
+            for stylist in stylists_serialized:
+                stylist_documents = StylistDocument.objects.filter(
+                    stylist_id=stylist.get("id"))
+                serilized_documents = DocumentsSerializer(
+                    stylist_documents, many=True).data
+                serilized_documents[0].pop("stylist_id")
+                stylist["documents"] = serilized_documents
+
             return Response(stylists_serialized, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -177,12 +185,12 @@ class StylelListView(APIView):
             stylist = Stylist.objects.get(user=request.user)
 
             style_data = request.data
+            
 
             categorie_serializer = StyleCategorieSerializer(data=request.data)
 
             if categorie_serializer.is_valid():
                 categorie = categorie_serializer.save()
-
                 style_serializer = StyleSerializer(
                     data=style_data, context={'stylist': stylist, 'category': categorie})
 
@@ -192,6 +200,48 @@ class StylelListView(APIView):
                 return Response(style_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(categorie_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class VariationListView(APIView):
+    """method to get all variations"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        try:
+            variations = StyleVariation.objects.all()
+
+            serializer = StyleVariationSerializer(variations, many=True).data
+
+            return Response(serializer, status=status.HTTP_200_OK)
+
+        except StyleVariation.DoesNotExist:
+            return Response({"error": "variation not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    """method to add a new variation"""
+
+    def post(self, request):
+
+        try:
+            style = Style.objects.get(u_id=request.data.get("u_id"))
+
+            variation_serializer = StyleVariationSerializer(
+                data=request.data, context={"style": style})
+
+            if variation_serializer.is_valid():
+                variation_serializer.save()
+
+                return Response({"msg": "success"}, status=status.HTTP_201_CREATED)
+
+            return Response(variation_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Style.DoesNotExist:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -272,3 +322,29 @@ class ApproveTransactionAPIView(APIView):
 
         except transaction.DoesNotExist():
             return Response({"message": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CategoryView(APIView):
+    """method to get all categories"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        try:
+            categories = StyleCategorie.objects.all()
+            serializer = StyleCategorieSerializer(categories, many=True).data
+            return Response(serializer, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request):
+        try:
+            serializer = StyleCategorieSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "success"}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

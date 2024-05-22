@@ -11,8 +11,6 @@ urlpatterns = [
          name='view styles'),
     path('style/<str:u_id>/', views.StyleDetailView.as_view(),
          name='view style_detail'),
-    path('style/category/', views.CategoryView.as_view(),
-         name='view all_categories'),
     path('booking/', views.BookingView.as_view(),
          name='view_create booking'),
     path('booking/<str:u_id>/', views.BookingDetailView.as_view(),

@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from authentication.models import Client, Stylist, User
+from stylist.models import Style
 # Create your models here.
 
 
@@ -22,6 +23,7 @@ class Booking(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default='pending')
     completed = models.BooleanField(default=False)
+    style_id = models.ForeignKey(Style, on_delete=models.CASCADE)
     u_id = models.UUIDField(editable=False, default=uuid.uuid4)
 
     def save(self, *args, **kwargs):

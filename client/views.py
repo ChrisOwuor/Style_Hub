@@ -8,8 +8,8 @@ from Api.models import Booking
 from Api.serializers import BookingSerializer
 from authentication.models import Client, Stylist
 from authentication.serializers import ClientSerializer
-from stylist.models import Style, StyleCategorie
-from stylist.serializers import StyleCategorieSerializer, StyleSerializer
+from stylist.models import Style, StyleCategorie, StyleVariation
+from stylist.serializers import StyleCategorieSerializer, StyleSerializer, StyleVariationSerializer
 
 # Create your views here.
 
@@ -60,10 +60,14 @@ class StyleListView(APIView):
             serializer = StyleSerializer(styles, many=True).data
 
             for style in serializer:
+                variations = StyleVariation.objects.filter(style=style["id"])
+                serialized_variations = StyleVariationSerializer(
+                    variations, many=True).data
                 style["style_category"] = StyleCategorie.objects.get(
                     id=style.get('category')).category_name
                 style['stylist'] = Stylist.objects.get(
                     id=style['stylist']).user_name
+                style['variations'] = serialized_variations
                 style.pop('category')
 
             return Response(serializer, status=status.HTTP_200_OK)
@@ -113,26 +117,12 @@ class StyleCategoryView(APIView):
             serializer = StyleSerializer(styles, many=True).data
             return Response(serializer, status=status.HTTP_200_OK)
 
-        except category.DoesNotExist:
+        except StyleCategorie.DoesNotExist:
             return Response({"msg": "category missing"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class CategoryView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-
-        try:
-
-            category = StyleCategorie.objects.all()
-            serializer = StyleCategorieSerializer(category, many=True).data
-            return Response(serializer, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class BookingView(APIView):
